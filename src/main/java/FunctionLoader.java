@@ -9,13 +9,21 @@ public class FunctionLoader {
     }
 
     public FriendsFunction load(String functionName, FunctionDefinition functionDefinition) {
+        String extension = functionDefinition.getExtension();
+        if (!isLanguageAvailable(extension)) {
+            throw new RuntimeException(String.format("Language %s is not available", extension));
+        }
         try {
-            final Value value = context.eval(functionDefinition.getExtension(), functionDefinition.getDefinition());
+            final Value value = context.eval(extension, functionDefinition.getDefinition());
             return FriendsFunction.from(value);
         } catch (Exception e) {
             System.err.println(String.format("Error in loading function %s", functionName));
             e.printStackTrace();
             throw e;
         }
+    }
+
+    private boolean isLanguageAvailable(String language) {
+        return context.getEngine().getLanguages().keySet().contains(language);
     }
 }
